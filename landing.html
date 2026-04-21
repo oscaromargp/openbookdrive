@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenBookDrive - Comparte y Descubre Libros Libres</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #991b1b;
+            --bg-dark: #030307;
+            --bg-card: #0c0c14;
+        }
+        
+        body {
+            background: var(--bg-dark);
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glow {
+            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
+        }
+        
+        .glow-blue {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.5);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: particle-float 15s infinite;
+        }
+        
+        @keyframes particle-float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .hero-gradient {
+            background: radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
+        }
+        
+        .book-float {
+            animation: book-float 8s ease-in-out infinite;
+        }
+        
+        @keyframes book-float {
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-15px) rotateY(5deg); }
+        }
+        
+        .section-mission {
+            background: linear-gradient(180deg, transparent 0%, rgba(220, 38, 38, 0.05) 50%, transparent 100%);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.05) 100%);
+        }
+        
+        .xrp-card {
+            background: linear-gradient(135deg, #23292f 0%, #1a1f25 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Header -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <span class="text-red-600 font-black text-2xl tracking-tight">Open</span>
+                <span class="text-white font-black text-2xl tracking-tight">BookDrive</span>
+            </a>
+            <div class="hidden md:flex items-center gap-6">
+                <a href="#mission" class="text-gray-400 hover:text-white transition text-sm">Misión</a>
+                <a href="#features" class="text-gray-400 hover:text-white transition text-sm">Características</a>
+                <a href="#donate" class="text-gray-400 hover:text-white transition text-sm">Donar</a>
+                <a href="https://openbookdrive.vercel.app" class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold btn-glow transition">
+                    Explorar Libros
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center hero-gradient pt-20">
+        <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-6">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-sm text-gray-400">Biblioteca pública activa</span>
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-black mb-6 leading-tight">
+                    <span class="text-gradient">Comparte</span> conocimiento,<br>
+                    <span class="text-red-500">transforma</span> vidas
+                </h1>
+                <p class="text-xl text-gray-400 mb-8 max-w-xl mx-auto lg:mx-0">
+                    El conocimiento pertenece a todos. OpenBookDrive es una plataforma donde la comunidad comparte libros libremente, sin barreras ni restricciones.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="https://openbookdrive.vercel.app" class="btn-primary px-8 py-4 rounded-xl font-bold text-lg btn-glow transition">
+                        Explorar Biblioteca
+                    </a>
+                    <a href="#mission" class="glass px-8 py-4 rounded-xl font-semibold text-gray-300 hover:text-white transition">
+                        Conocer Más
+                    </a>
+                </div>
+                <div class="mt-10 flex items-center justify-center lg:justify-start gap-8">
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-white">∞</p>
+                        <p class="text-sm text-gray-500">Libros Disponibles</p>
+                    </div>
+                    <div class="w-px h-12 bg-white/10"></div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-white">100%</p>
+                        <p class="text-sm text-gray-500">Gratuito</p>
+                    </div>
+                    <div class="w-px h-12 bg-white/10"></div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-white">🌍</p>
+                        <p class="text-sm text-gray-500">Acceso Universal</p>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="book-float relative z-10">
+                    <div class="w-64 h-80 mx-auto glass-card rounded-2xl flex items-center justify-center glow">
+                        <div class="text-center p-6">
+                            <div class="w-20 h-24 mx-auto mb-4 bg-gradient-to-br from-red-600 to-red-800 rounded-lg flex items-center justify-center">
+                                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 2H6c-1.206 0-3 .799-3 3v14c0 2.201 1.794 3 3 3h15v-2H6.012C5.55 19.988 5 19.806 5 19s.55-.988 1.012-1H21V4c0-1.103-.897-2-2-2zm0 14H5V5c0-.806.55-.988 1-1h13v12z"/>
+                                </svg>
+                            </div>
+                            <p class="text-lg font-semibold text-white">Biblioteca Abierta</p>
+                            <p class="text-sm text-gray-500">Para todos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-600/20 blur-3xl rounded-full"></div>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission" class="py-24 section-mission">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">
+                    ¿Por qué <span class="text-red-500">compartir</span>?
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    El conocimiento es poder, pero solo cuando es accesible
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Democratizar el Acceso</h3>
+                    <p class="text-gray-400">
+                        Millones de personas no tienen acceso a bibliotecas o librerías. Compartir libros elimina barreras económicas y geográficas.
+                    </p>
+                </div>
+                
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Fortalecer Comunidades</h3>
+                    <p class="text-gray-400">
+                        Cuando compartimos conocimiento, creamos comunidades más fuertes, informadas y capaces de transformar su entorno.
+                    </p>
+                </div>
+                
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Acelerar el Aprendizaje</h3>
+                    <p class="text-gray-400">
+                        Un libro compartido puede inspirar a decenas de personas. El conocimiento se multiplica cuando se distribuye libremente.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-16 glass p-8 rounded-2xl text-center">
+                <h3 class="text-2xl font-bold text-white mb-4">¿Cómo puedes ayudar?</h3>
+                <p class="text-gray-400 mb-6 max-w-xl mx-auto">
+                    Sube tus libros a la plataforma, recomienda títulos a otros, o simplemente spread the word. Cada acción cuenta.
+                </p>
+                <a href="https://openbookdrive.vercel.app" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold btn-glow transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Subir un Libro
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">
+                    ¿Qué hace <span class="text-red-500">especial</span> a OpenBookDrive?
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Tecnología al servicio de la comunidad
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Biblioteca Digital Libre</h3>
+                    <p class="text-gray-400 text-sm">Accede a miles de libros de forma gratuita, sin suscripciones ni cargos ocultos.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Búsqueda Inteligente</h3>
+                    <p class="text-gray-400 text-sm">Encuentra rápidamente el libro que buscas gracias a nuestra integración con OpenLibrary.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Descarga Directa</h3>
+                    <p class="text-gray-400 text-sm">Descarga libros directamente desde Google Drive con un solo clic.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Solicita Libros</h3>
+                    <p class="text-gray-400 text-sm">¿No encontraste lo que buscas? Solicita libros y la comunidad podrá ayudarte.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Comparte Fácil</h3>
+                    <p class="text-gray-400 text-sm">Con tu cuenta Google, sube tus propios libros y comparte conocimiento.</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl hover:border-red-500/30 transition group">
+                    <div class="w-12 h-12 bg-red-600/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Acceso Global</h3>
+                    <p class="text-gray-400 text-sm">Accede desde cualquier parte del mundo. Solo necesitas conexión a internet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donate Section -->
+    <section id="donate" class="py-24 bg-gradient-to-b from-transparent to-red-900/10">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">
+                    Apoya este <span class="text-red-500">proyecto</span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Tu contribución ayuda a mantener la plataforma operativa y seguir expandiendo el acceso al conocimiento.
+                </p>
+            </div>
+            
+            <div class="xrp-card rounded-2xl p-8 glow-blue">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="flex-shrink-0">
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#00d395] to-[#00a87d] flex items-center justify-center">
+                            <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1 text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-white mb-2">Donaciones en Criptomonedas — Red XRP</h3>
+                        <p class="text-gray-400 mb-4">
+                            Tu apoyo con XRP ayuda a mantener los servidores y continuar mejorando la plataforma.
+                        </p>
+                        <div class="flex flex-col md:flex-row items-center gap-4">
+                            <div class="flex-1 bg-black/30 rounded-xl p-4 font-mono text-sm break-all">
+                                <p class="text-gray-500 text-xs mb-1">Dirección XRP:</p>
+                                <p class="text-white select-all">rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj</p>
+                            </div>
+                            <button onclick="copyXRP()" class="copy-btn px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copiar
+                            </button>
+                        </div>
+                        <p id="copy-feedback" class="text-green-500 text-sm mt-2 hidden">¡Dirección copiada!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 grid md:grid-cols-3 gap-6 text-center">
+                <div class="glass p-6 rounded-xl">
+                    <p class="text-3xl mb-2">☕</p>
+                    <p class="text-gray-400 text-sm">Un café para el equipo</p>
+                </div>
+                <div class="glass p-6 rounded-xl">
+                    <p class="text-3xl mb-2">💻</p>
+                    <p class="text-gray-400 text-sm">Mantiene los servidores</p>
+                </div>
+                <div class="glass p-6 rounded-xl">
+                    <p class="text-3xl mb-2">📚</p>
+                    <p class="text-gray-400 text-sm">Nuevas funcionalidades</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+                ¿Listo para <span class="text-red-500">comenzar</span>?
+            </h2>
+            <p class="text-xl text-gray-400 mb-8">
+                Únete a la comunidad y ayuda a democratizar el conocimiento
+            </p>
+            <a href="https://openbookdrive.vercel.app" class="btn-primary inline-flex items-center gap-2 px-10 py-5 rounded-2xl font-bold text-xl btn-glow transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Ir a OpenBookDrive
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="text-red-600 font-black text-xl">Open</span>
+                    <span class="text-white font-black text-xl">BookDrive</span>
+                </div>
+                <div class="flex items-center gap-6 text-gray-500 text-sm">
+                    <a href="https://github.com/oscaromargp/openbookdrive" class="hover:text-white transition">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <span>© 2024 OpenBookDrive. Código abierto.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Generate particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Copy XRP address
+        function copyXRP() {
+            const address = 'rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj';
+            navigator.clipboard.writeText(address).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.classList.remove('hidden');
+                setTimeout(() => {
+                    feedback.classList.add('hidden');
+                }, 2000);
+            });
+        }
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        createParticles();
+    </script>
+</body>
+</html>
