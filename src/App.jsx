@@ -38,6 +38,7 @@ function MainApp() {
   const [showLanding, setShowLanding] = useState(true)
   const [filterType, setFilterType] = useState('all')
   const [filterQuery, setFilterQuery] = useState('')
+  const [sortBy, setSortBy] = useState('title')
 
   const featuredBook = books[0] || null
   const genres = Object.keys(booksByGenre)
@@ -51,23 +52,31 @@ function MainApp() {
   const filteredBooks = useMemo(() => {
     if (!filterQuery.trim()) return books
     
+    let results
     if (filterType === 'all') {
-      const results = fuse.search(filterQuery)
-      return results.map(r => r.item)
+      const fuseResults = fuse.search(filterQuery)
+      results = fuseResults.map(r => r.item)
+    } else {
+      const query = filterQuery.toLowerCase()
+      results = books.filter(book => {
+        const title = (book.title || book.name || '').toLowerCase()
+        const author = (book.author || '').toLowerCase()
+        const genre = (book.genre || '').toLowerCase()
+        
+        if (filterType === 'title') return title.includes(query)
+        if (filterType === 'author') return author.includes(query)
+        if (filterType === 'genre') return genre.includes(query)
+        return title.includes(query) || author.includes(query) || genre.includes(query)
+      })
     }
     
-    const query = filterQuery.toLowerCase()
-    return books.filter(book => {
-      const title = (book.title || book.name || '').toLowerCase()
-      const author = (book.author || '').toLowerCase()
-      const genre = (book.genre || '').toLowerCase()
-      
-      if (filterType === 'title') return title.includes(query)
-      if (filterType === 'author') return author.includes(query)
-      if (filterType === 'genre') return genre.includes(query)
-      return title.includes(query) || author.includes(query) || genre.includes(query)
+    return [...results].sort((a, b) => {
+      if (sortBy === 'title') return (a.title || a.name || '').localeCompare(b.title || b.name || '')
+      if (sortBy === 'author') return (a.author || '').localeCompare(b.author || '')
+      if (sortBy === 'recent') return (b.createdTime || '').localeCompare(a.createdTime || '')
+      return 0
     })
-  }, [books, filterQuery, filterType, fuse])
+  }, [books, filterQuery, filterType, fuse, sortBy])
 
   const filteredBooksByGenre = useMemo(() => {
     if (filterType === 'genre' && filterQuery.trim()) {
@@ -157,7 +166,7 @@ function MainApp() {
           </button>
         </div>
 
-        <div className="hidden md:flex items-center gap-4 flex-1 max-w-2xl mx-8">
+        <div className="hidden md:flex items-center gap-4 flex-1 max-w-3xl mx-8">
           <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 flex-1 border border-white/5">
             <select 
               value={filterType}
@@ -181,6 +190,15 @@ function MainApp() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-white/5 text-gray-400 text-sm px-3 py-2 rounded-lg border border-white/5 outline-none cursor-pointer hover:text-amber-400 transition"
+          >
+            <option value="title">A-Z</option>
+            <option value="recent">Más Recientes</option>
+            <option value="author">Autor</option>
+          </select>
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
@@ -342,8 +360,9 @@ function MainApp() {
         <p>OpenBookDrive - Comparte y descubre libros</p>
         <p className="mt-1">Powered by Google Drive + OpenLibrary</p>
         <div className="mt-4 flex justify-center gap-4 text-xs">
-          <a href="/terminos" className="hover:text-amber-400 transition">Términos y Condiciones</a>
-          <a href="/privacidad" className="hover:text-amber-400 transition">Política de Privacidad</a>
+          <a href="/terminos" className="hover:text-amber-400 transition">Términos</a>
+          <a href="/privacidad" className="hover:text-amber-400 transition">Privacidad</a>
+          <a href="https://github.com/oscaromargp/openbookdrive/releases" target="_blank" rel="noreferrer" className="hover:text-amber-400 transition">Changelog</a>
         </div>
       </footer>
 
@@ -739,8 +758,9 @@ function LandingPage({ onLogin, onExplore, onDownload, bookCount }) {
         <div className="max-w-7xl mx-auto px-6 text-center text-gray-600 text-sm">
           <p>© 2024 OpenBookDrive. Código abierto.</p>
           <div className="mt-4 flex justify-center gap-4">
-            <a href="/terminos" className="hover:text-amber-400 transition">Términos y Condiciones</a>
-            <a href="/privacidad" className="hover:text-amber-400 transition">Política de Privacidad</a>
+            <a href="/terminos" className="hover:text-amber-400 transition">Términos</a>
+            <a href="/privacidad" className="hover:text-amber-400 transition">Privacidad</a>
+            <a href="https://github.com/oscaromargp/openbookdrive/releases" target="_blank" rel="noreferrer" className="hover:text-amber-400 transition">Changelog</a>
           </div>
         </div>
       </footer>

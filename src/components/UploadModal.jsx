@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useOpenLibrary } from '../hooks/useOpenLibrary'
 
@@ -6,21 +6,20 @@ const DRIVE_UPLOAD_URL = import.meta.env.VITE_DRIVE_UPLOAD_URL || 'https://drive
 
 export default function UploadModal({ onClose }) {
   const { user, login } = useAuth()
-  const { searchByTitle } = useOpenLibrary()
+  const { searchBooks } = useOpenLibrary()
   const [email, setEmail] = useState(user?.email || '')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
+  const [file, setFile] = useState(null)
   const [genre, setGenre] = useState('')
-  const [bookInfo, setBookInfo] = useState(null)
+  const [autoDetect, setAutoDetect] = useState(true)
+  const [detectedInfo, setDetectedInfo] = useState(null)
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
-  const fileInputRef = useRef(null)
 
   const genres = [
     'Ficción', 'Ingeniería', 'Autocuidado', 'Historia', 
-    'Ciencias', 'Negocios', 'Arte & Diseño', 'Otro'
+    'Ciencias', 'Negocios', 'Arte & Diseño', 'General'
   ]
 
   useEffect(() => {
@@ -29,34 +28,51 @@ export default function UploadModal({ onClose }) {
     return () => window.removeEventListener('keydown', handleKey)
   }, [onClose])
 
-  const handleSearchBook = async () => {
-    if (!title) return
-    setLoading(true)
-    const results = await searchByTitle(title, 1)
-    if (results.length > 0) {
-      setBookInfo(results[0])
-      if (!author) setAuthor(results[0].author)
-      if (!genre) setGenre(detectGenre(results[0].subjects))
+  useEffect(() => {
+    if (file && autoDetect) {
+      const filename = file.name.replace(/\.(pdf|epub|mobi|docx?)$/i, '')
+      detectBookInfo(filename)
     }
-    setLoading(false)
+  }, [file, autoDetect])
+
+  const detectBookInfo = async (filename) => {
+    setLoading(true)
+    try {
+      const results = await searchBooks(filename, 1)
+      if (results.length > 0) {
+        const book = results[0]
+        setDetectedInfo({
+          title: book.title,
+          author: book.author,
+          year: book.year,
+          cover: book.cover,
+          genre: detectGenre(book.subjects)
+        })
+      }
+    } catch (err) {
+      console.error('Error detecting book info:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const detectGenre = (subjects) => {
-    if (!subjects) return 'Otro'
+    if (!subjects) return 'General'
     const genreMap = {
-      'Ficción': ['fiction', 'novel', 'fantasy', 'sci-fi'],
-      'Ingeniería': ['programming', 'software', 'engineering', 'code'],
-      'Autocuidado': ['self-help', 'motivation', 'mindfulness'],
-      'Historia': ['history', 'historical', 'biography'],
-      'Ciencias': ['science', 'math', 'physics'],
-      'Negocios': ['business', 'entrepreneurship', 'marketing'],
+      'Ficción': ['fiction', 'novel', 'fantasy', 'sci-fi', 'romance', 'mystery'],
+      'Ingeniería': ['programming', 'software', 'engineering', 'code', 'computer', 'technology'],
+      'Autocuidado': ['self-help', 'motivation', 'mindfulness', 'psychology', 'health'],
+      'Historia': ['history', 'historical', 'biography', 'war'],
+      'Ciencias': ['science', 'math', 'physics', 'biology', 'chemistry'],
+      'Negocios': ['business', 'entrepreneurship', 'marketing', 'finance', 'economics'],
+      'Arte & Diseño': ['art', 'design', 'photography', 'music', 'architecture'],
     }
     for (const [g, keywords] of Object.entries(genreMap)) {
       if (subjects.some(s => keywords.some(k => s.toLowerCase().includes(k)))) {
         return g
       }
     }
-    return 'Otro'
+    return 'General'
   }
 
   const handleEmailSubmit = async (e) => {
@@ -73,8 +89,12 @@ export default function UploadModal({ onClose }) {
       setError('Necesitas iniciar sesión primero')
       return
     }
-    if (!title) {
-      setError('Título requerido')
+    if (!file) {
+      setError('Selecciona un archivo')
+      return
+    }
+    if (!genre) {
+      setError('Selecciona un género')
       return
     }
     
@@ -83,10 +103,11 @@ export default function UploadModal({ onClose }) {
 
     const requestData = {
       email,
-      title,
-      author: author || 'No especificado',
-      genre: genre || 'Otro',
-      uploadedAt: new Date().toISOString()
+      filename: file.name,
+      title: detectedInfo?.title || file.name.replace(/\.(pdf|epub|mobi|docx?)$/i, ''),
+      author: detectedInfo?.author || 'No especificado',
+      genre,
+      detectedAt: new Date().toISOString()
     }
 
     localStorage.setItem('openbookdrive_upload_pending', JSON.stringify(requestData))
@@ -105,7 +126,7 @@ export default function UploadModal({ onClose }) {
       onClick={onClose}
     >
       <div
-        className="bg-[#0f0f1a] rounded-2xl overflow-hidden max-w-lg w-full shadow-2xl border border-white/10"
+        className="bg-card rounded-2xl overflow-hidden max-w-md w-full shadow-2xl border border-white/10"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6">
@@ -120,20 +141,20 @@ export default function UploadModal({ onClose }) {
             <form onSubmit={handleEmailSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-2">
-                  Tu email para identificarte
+                  Tu email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
               >
                 Continuar
               </button>
@@ -145,9 +166,9 @@ export default function UploadModal({ onClose }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">¡Solicitud Enviada!</h3>
+              <h3 className="text-xl font-bold text-white mb-2">¡Listo!</h3>
               <p className="text-gray-400 mb-4">
-                Serás redirigido a Google Drive para subir el archivo
+                Serás redirigido a Google Drive
               </p>
               <a
                 href={DRIVE_UPLOAD_URL}
@@ -160,97 +181,86 @@ export default function UploadModal({ onClose }) {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
                 <p className="text-green-400 text-sm">
-                  Sesión iniciada como: {user.email}
+                  Conectado: {user.email}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Buscar libro (opcional)</label>
-                <div className="flex gap-2">
+                <label className="block text-sm text-gray-400 mb-2">Archivo</label>
+                <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-amber-500 transition-colors relative">
                   <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Título del libro"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+                    type="file"
+                    accept=".pdf,.epub,.mobi"
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <button
-                    type="button"
-                    onClick={handleSearchBook}
-                    disabled={loading || !title}
-                    className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 disabled:opacity-50"
-                  >
-                    {loading ? '...' : 'Buscar'}
-                  </button>
+                  {file ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <div className="text-left">
+                        <p className="text-white font-medium">{file.name}</p>
+                        <p className="text-gray-500 text-sm">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <svg className="w-10 h-10 text-gray-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="text-gray-400">Arrastra o haz clic</p>
+                      <p className="text-gray-600 text-xs mt-1">PDF, EPUB hasta 100MB</p>
+                    </>
+                  )}
                 </div>
-                {bookInfo && (
-                  <div className="mt-2 flex items-center gap-2 text-green-400 text-sm">
+              </div>
+
+              {detectedInfo && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-amber-400 text-sm mb-2">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M5 13l4 4L19 7" />
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                     </svg>
-                    {bookInfo.title} - {bookInfo.author}
+                    <span className="font-medium">Información detectada</span>
                   </div>
-                )}
-              </div>
+                  <p className="text-white text-sm">{detectedInfo.title}</p>
+                  <p className="text-gray-500 text-xs">{detectedInfo.author} • {detectedInfo.year}</p>
+                </div>
+              )}
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Título del libro</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Título"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Autor</label>
-                <input
-                  type="text"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Autor del libro"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
-                />
-              </div>
+              {loading && (
+                <div className="flex items-center gap-2 text-gray-500 text-sm">
+                  <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                  Detectando información del libro...
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Género</label>
                 <select
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-red-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-500"
                 >
-                  <option value="" className="text-black">Seleccionar género</option>
+                  <option value="" className="text-black">Seleccionar</option>
                   {genres.map(g => (
                     <option key={g} value={g} className="text-black">{g}</option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Archivo (PDF/EPUB)</label>
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer hover:border-red-500 transition-colors"
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.epub,.mobi"
-                    className="hidden"
-                  />
-                  <svg className="w-8 h-8 text-gray-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <p className="text-gray-400 text-sm">Arrastra o haz clic para seleccionar</p>
-                  <p className="text-gray-600 text-xs mt-1">PDF, EPUB hasta 100MB</p>
-                </div>
-              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={autoDetect} 
+                  onChange={(e) => setAutoDetect(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/30 bg-white/10 text-amber-500"
+                />
+                Auto-detectar título y autor
+              </label>
 
               {error && (
                 <p className="text-red-400 text-sm">{error}</p>
@@ -258,20 +268,20 @@ export default function UploadModal({ onClose }) {
 
               <button
                 onClick={handleUpload}
-                disabled={uploading}
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={uploading || !file || !genre}
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {uploading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Subiendo...
+                    Procesando...
                   </>
                 ) : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    Solicitar subir libro
+                    Continuar a Google Drive
                   </>
                 )}
               </button>
