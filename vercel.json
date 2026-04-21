@@ -1,3 +1,12 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "build": {
+    "env": {
+      "VITE_DRIVE_FOLDER_ID": "1iSvuUSw8ud2qPDFmACxZCt0k4hyAKtTM",
+      "VITE_DRIVE_UPLOAD_URL": "https://drive.google.com/drive/folders/1iSvuUSw8ud2qPDFmACxZCt0k4hyAKtTM"
+    }
+  }
 }
