@@ -4,27 +4,54 @@ import { useOpenLibrary } from '../hooks/useOpenLibrary'
 export default function BookModal({ book, onClose, onDownload }) {
   const [bookDetails, setBookDetails] = useState(null)
   const [loading, setLoading] = useState(false)
-  const { getBookDetails } = useOpenLibrary()
+  const { getBookDetails, searchBooks } = useOpenLibrary()
 
   useEffect(() => {
     if (!book) return
 
     async function fetchDetails() {
-      if (book.openLibraryKey) {
-        setLoading(true)
-        try {
+      setLoading(true)
+      try {
+        if (book.openLibraryKey) {
           const details = await getBookDetails(book.openLibraryKey)
           setBookDetails(details)
-        } catch (err) {
-          console.error('Error fetching book details:', err)
-        } finally {
-          setLoading(false)
+        } else if (book.title || book.name) {
+          const searchQuery = book.title || book.name
+          const results = await searchBooks(searchQuery, 1)
+          if (results && results.length > 0) {
+            const firstResult = results[0]
+            setBookDetails({
+              title: firstResult.title,
+              author: firstResult.author,
+              year: firstResult.year,
+              cover: firstResult.cover,
+              description: firstResult.subjects?.[0] || null,
+              subjects: firstResult.subjects || [],
+              publisher: firstResult.publisher,
+              pages: firstResult.pages,
+              openLibraryKey: firstResult.openLibraryKey,
+            })
+            if (firstResult.openLibraryKey) {
+              const fullDetails = await getBookDetails(firstResult.openLibraryKey)
+              if (fullDetails) {
+                setBookDetails(prev => ({
+                  ...prev,
+                  description: fullDetails.description || prev.description,
+                  subjects: fullDetails.subjects?.length > 0 ? fullDetails.subjects : prev.subjects,
+                }))
+              }
+            }
+          }
         }
+      } catch (err) {
+        console.error('Error fetching book details:', err)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchDetails()
-  }, [book, getBookDetails])
+  }, [book, getBookDetails, searchBooks])
 
   useEffect(() => {
     const handleKey = (e) => { 
@@ -37,13 +64,13 @@ export default function BookModal({ book, onClose, onDownload }) {
   if (!book) return null
 
   const title = book.title || book.name || 'Sin título'
-  const author = book.author || 'Autor desconocido'
-  const year = book.year
-  const cover = book.cover || book.thumbnail
+  const author = book.author || bookDetails?.author || 'Autor desconocido'
+  const year = book.year || bookDetails?.year
+  const cover = book.cover || bookDetails?.cover || book.thumbnail
   const description = book.description || bookDetails?.description || book.subjects?.[0]
   const subjects = book.subjects || bookDetails?.subjects || []
-  const publisher = book.publisher || book.publishers?.[0]
-  const pages = book.pages
+  const publisher = book.publisher || bookDetails?.publisher || book.publishers?.[0]
+  const pages = book.pages || bookDetails?.pages
 
   const handleImageError = (e) => {
     e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=1a1a2e&color=fff&size=400&bold=true`
@@ -69,7 +96,7 @@ export default function BookModal({ book, onClose, onDownload }) {
           <div className="md:w-64 lg:w-80 flex-shrink-0 bg-black relative">
             <div className="aspect-[2/3] w-full h-full">
               <img
-                src={cover}
+                src={bookDetails?.cover || cover}
                 alt={title}
                 className="w-full h-full object-cover"
                 onError={handleImageError}

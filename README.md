@@ -1,54 +1,58 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/oscaromargp/openbookdrive/main/public/banner.png" alt="OpenBookDrive Banner" width="100%" />
+  <img src="assets/banner.png" alt="OpenBookDrive" width="100%"/>
+</p>
+
+<h1 align="center">OpenBookDrive</h1>
+
+<p align="center">
+  <strong>Biblioteca digital gratuita para compartir y descubrir libros. Acceso libre al conocimiento para todos.</strong>
 </p>
 
 <p align="center">
-  <a href="https://openbookdrive.vercel.app">
-    <img src="https://img.shields.io/badge/Live-Demo-red?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
-  </a>
-  <a href="https://github.com/oscaromargp/openbookdrive/stargazers">
-    <img src="https://img.shields.io/github/stars/oscaromargp/openbookdrive?style=for-the-badge&logo=github" alt="Stars" />
-  </a>
-  <a href="https://github.com/oscaromargp/openbookdrive/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/oscaromargp/openbookdrive?style=for-the-badge" alt="License" />
-  </a>
-  <a href="https://vercel.com/?utm_source=openbookdrive&utm_campaign=oss">
-    <img src="https://img.shields.io/badge/Powered_by-Vercel-000000?style=for-the-badge&logo=vercel" alt="Vercel" />
-  </a>
-</p>
-
----
-
-<p align="center">
-  <strong>📚 OpenBookDrive</strong> — Biblioteca digital gratuita para compartir y descubrir libros. Acceso libre al conocimiento para todos.
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License"/>
+  <img src="https://img.shields.io/badge/version-1.0.0-green?style=for-the-badge" alt="Version"/>
+  <img src="https://img.shields.io/badge/status-active-brightgreen?style=for-the-badge" alt="Status"/>
+  <img src="https://img.shields.io/badge/PRs-welcome-orange?style=for-the-badge" alt="PRs"/>
 </p>
 
 <p align="center">
-  <a href="#-demo">Demo</a> •
+  <a href="#-acerca-del-proyecto">Acerca</a> •
   <a href="#-características">Características</a> •
-  <a href="#-tecnologías">Tecnologías</a> •
-  <a href="#-instalación">Instalación</a> •
-  <a href="#-configuración">Configuración</a> •
-  <a href="#-deploy">Deploy</a> •
-  <a href="#-contribuir">Contribuir</a>
+  <a href="#-demo">Demo</a> •
+  <a href="#-comenzando">Comenzando</a> •
+  <a href="#-uso">Uso</a> •
+  <a href="#-contacto">Contacto</a>
 </p>
 
 ---
 
-## 📸 Demo Visual
+## 📖 Acerca del Proyecto
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/oscaromargp/openbookdrive/main/public/screenshot.png" alt="OpenBookDrive Screenshot" width="100%" />
+  <img src="assets/screenshot.png" alt="Captura de pantalla principal" width="700"/>
 </p>
 
-> **Nota**: La imagen anterior es una representación visual. Visita [openbookdrive.vercel.app](https://openbookdrive.vercel.app) para ver la aplicación en vivo.
+**OpenBookDrive** es una plataforma web para compartir y descubrir libros de forma gratuita. Inspirada en Netflix, permite a los usuarios explorar una biblioteca digital organizada por géneros, con portadas de alta calidad, información detallada de cada libro (autor, descripción, año) y un sistema de colaboración comunitario.
+
+El conocimiento pertenece a todos. OpenBookDrive es una plataforma donde la comunidad comparte libros libremente, sin barreras ni restricciones.
+
+### 🛠️ Construido Con
+
+<p align="left">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react" alt="React"/>
+  <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite" alt="Vite"/>
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind"/>
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel" alt="Vercel"/>
+  <img src="https://img.shields.io/badge/Google_Drive-4285F4?style=for-the-badge&logo=google-drive" alt="Google Drive"/>
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase" alt="Supabase"/>
+</p>
 
 ---
 
 ## ✨ Características
 
 | Característica | Descripción |
-|----------------|-------------|
+|---|---|
 | 🎨 **Interfaz Netflix** | Carruseles horizontales, hero destacado, diseño dark mode |
 | 📖 **Metadatos Enriquecidos** | Autor, descripción, año, editorial vía OpenLibrary |
 | 🔍 **Búsqueda en Tiempo Real** | Encuentra libros instantáneamente |
@@ -60,83 +64,48 @@
 
 ---
 
-## 🏗️ Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    OPENBOOKDRIVE                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  FRONTEND (React + Vite + Tailwind)                       │
-│  ├── App.jsx              - Componente principal           │
-│  ├── hooks/                                                  │
-│  │   ├── useGoogleDrive.js  - Integración Drive API        │
-│  │   ├── useOpenLibrary.js  - Metadatos de libros         │
-│  │   └── useAuth.js         - Autenticación                │
-│  └── components/                                             │
-│       ├── Hero.jsx          - Libro destacado              │
-│       ├── BookCard.jsx      - Tarjeta de libro            │
-│       ├── BookModal.jsx     - Detalle del libro           │
-│       ├── BookRow.jsx       - Carrusel por género         │
-│       ├── SearchBar.jsx      - Búsqueda                    │
-│       ├── UploadModal.jsx    - Subir libros                │
-│       ├── RequestModal.jsx  - Solicitar libros            │
-│       ├── RequestList.jsx   - Lista de solicitudes        │
-│       └── AuthModal.jsx     - Login por email             │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  BACKEND / STORAGE                                         │
-│  ├── Google Drive API    - Almacenamiento de PDFs         │
-│  ├── OpenLibrary API     - Metadatos de libros (gratis)   │
-│  ├── Supabase (opcional) - Auth + DB para escalabilidad   │
-│  └── localStorage        - Fallback sin backend            │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🛠️ Tecnologías
+## 🎬 Demo
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=react,vite,tailwind,vercel,googlecloud,supabase" />
+  <img src="assets/demo.gif" alt="Demo animado" width="700"/>
 </p>
 
-| Tecnología | Uso |
-|------------|-----|
-| **React 18** | Framework UI |
-| **Vite** | Build tool |
-| **Tailwind CSS** | Estilos |
-| **Google Drive API** | Storage de archivos |
-| **OpenLibrary API** | Metadatos de libros |
-| **Supabase** | Auth/DB (opcional) |
+> ¿No puedes ver el GIF? [Haz clic aquí para ver el demo en video](https://github.com/oscaromargp/openbookdrive)
 
 ---
 
-## 🚀 Instalación
+## 🚀 Comenzando
 
-```bash
-# Clonar el proyecto
-git clone https://github.com/oscaromargp/openbookdrive.git
-cd openbookdrive
+### Prerrequisitos
 
-# Instalar dependencias
-npm install
+- Node.js — versión `>= 18.0`
+- npm o yarn
 
-# Crear archivo .env
-cp .env.example .env
-# Edita con tus credenciales
+### Instalación
 
-# Ejecutar en desarrollo
-npm run dev
-```
+1. Clona el repositorio
+   ```sh
+   git clone https://github.com/oscaromargp/openbookdrive.git
+   cd openbookdrive
+   ```
 
----
+2. Instala las dependencias
+   ```sh
+   npm install
+   ```
 
-## ⚙️ Configuración
+3. Configura las variables de entorno
+   ```sh
+   cp .env.example .env
+   # Edita .env con tus valores
+   ```
 
-### Variables de Entorno (.env)
+4. Inicia el proyecto
+   ```sh
+   npm run dev
+   ```
+
+### Configuración de Variables de Entorno
 
 ```env
 # Google Drive (requerido para producción)
@@ -152,102 +121,105 @@ VITE_SUPABASE_URL=https://tu_proyecto.supabase.co
 VITE_SUPABASE_ANON_KEY=tu_anon_key
 ```
 
-### Cómo obtener credenciales
+---
 
-#### Google Drive API
-1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un proyecto
-3. Habilita "Google Drive API"
-4. Credenciales → API Key + OAuth 2.0
-5. Comparte tu carpeta Drive con "Cualquiera con el enlace"
+## 💡 Uso
 
-#### OpenLibrary API
-- **Gratis, sin API key requerida**
-- Documentación: https://openlibrary.org/dev/docs/api
+### Exploring the Library
+
+1. **Explora por géneros** — Navega los carruseles horizontales organizados por categoría
+2. **Busca libros** — Usa la barra de búsqueda para encontrar títulos específicos
+3. **Ver detalles** — Haz clic en cualquier libro para ver información completa
+
+### Subiendo Libros
+
+1. Haz clic en **"Subir"** en la barra de navegación
+2. Inicia sesión con tu email
+3. Serás redirigido a Google Drive donde puedes subir tus libros
+
+### Solicitando Libros
+
+1. Haz clic en **"Solicitudes"**
+2. Busca el libro que necesitas
+3. Envía tu solicitud a la comunidad
 
 ---
 
-## 🚢 Deploy
+## 🤝 Contribuyendo
 
-### Vercel (Recomendado)
+¡Las contribuciones son bienvenidas! Por favor lee las [guías de contribución](CONTRIBUTING.md).
 
-```bash
-npm run build
-vercel --prod
-```
-
-### Variables en Vercel
-
-| Variable | Descripción |
-|----------|-------------|
-| `VITE_GOOGLE_API_KEY` | Clave API de Google |
-| `VITE_GOOGLE_CLIENT_ID` | Client ID de OAuth |
-| `VITE_DRIVE_FOLDER_ID` | ID de carpeta Drive |
-| `VITE_DRIVE_UPLOAD_URL` | URL para subir archivos |
-| `VITE_SUPABASE_URL` | URL de Supabase (opcional) |
-| `VITE_SUPABASE_ANON_KEY` | Clave anónima (opcional) |
-
----
-
-## 🤝 Contribuir
-
-¡Las contribuciones son bienvenidas! Por favor lee nuestras [guías de contribución](CONTRIBUTING.md) primero.
-
-1. Fork del repo
-2. Crear branch: `git checkout -b feature/nueva-funcionalidad`
-3. Commit: `git commit -m 'feat: descripción'`
+1. Haz un fork del repositorio
+2. Crea tu rama: `git checkout -b feature/nueva-funcionalidad`
+3. Haz commit: `git commit -m 'feat: agrega nueva funcionalidad'`
 4. Push: `git push origin feature/nueva-funcionalidad`
-5. Pull Request
+5. Abre un Pull Request
+
+---
+
+## 💖 Apoya este Proyecto
+
+Si este proyecto te fue útil, considera hacer una contribución. Esto me ayuda a seguir creando herramientas de código abierto.
+
+<p align="center">
+  <strong>Donaciones en Criptomonedas — Red XRP</strong><br><br>
+  <img src="https://img.shields.io/badge/XRP-rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj-00AAE4?style=for-the-badge&logo=ripple" alt="XRP Address"/>
+</p>
+
+> Dirección XRP: `rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj`
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Distribuido bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más información.
 
 ---
 
-## 💚 Donaciones
-
-Si te gusta este proyecto y quieres apoiar su desarrollo,acceptamos donaciones en **XRP** (red Ripple):
-
-```
-rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj
-```
-
-<p align="center">
-  <img src="https://img.shields.io/badge/XRP_Donate-00d395?style=for-the-badge&logo=xrp" alt="Donate XRP" />
-</p>
-
----
-
-## 👤 Autor
-
-<p align="center">
-  <img src="https://avatars.githubusercontent.com/u/xxx?s=100&v=4" alt="Oscar Omar Gómez Peña" style="border-radius: 50%;" />
-</p>
+## 📬 Contacto
 
 <p align="center">
   <strong>Oscar Omar Gómez Peña</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/oscaromargp">
-    <img src="https://img.shields.io/badge/GitHub-@oscaromargp-181717?style=flat&logo=github" alt="GitHub" />
-  </a>
   <a href="https://oscaromargp.github.io/Oscaromargp/">
-    <img src="https://img.shields.io/badge/Portafolio-Web-0077B5?style=flat&logo=google-chrome" alt="Portafolio" />
+    <img src="https://img.shields.io/badge/Portafolio-Web-blueviolet?style=for-the-badge&logo=github" alt="Portafolio"/>
   </a>
+  &nbsp;
+  <a href="https://github.com/oscaromargp">
+    <img src="https://img.shields.io/badge/GitHub-oscaromargp-181717?style=for-the-badge&logo=github" alt="GitHub"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/oscaromargp/openbookdrive">Ver Repositorio</a>
 </p>
 
 ---
 
-<p align="center">
-  <sub>Hecho con ❤️ por <a href="https://github.com/oscaromargp">Oscar Omar Gómez Peña</a></sub>
-</p>
+## 🙏 Agradecimientos
 
 <p align="center">
-  <a href="https://vercel.com/?utm_source=openbookdrive&utm_campaign=oss">
-    <img src="https://simpleicons.org/icons/vercel.svg" width="30" height="30" alt="Powered by Vercel" />
-  </a>
+  <br/>
+  <em>
+    "Porque Dios es el que en vosotros produce<br/>
+    así el querer como el hacer,<br/>
+    por su buena voluntad."
+  </em>
+  <br/>
+  <strong>— Filipenses 2:13</strong>
+  <br/><br/>
+  Todo lo que aquí existe nació primero como un deseo en el corazón.<br/>
+  Cada proyecto, cada línea, cada idea que toma forma —<br/>
+  es un regalo de Aquel que nos dio tanto el sueño como la fuerza de alcanzarlo.<br/>
+  <strong>A Dios, toda la gloria.</strong>
+  <br/>
 </p>
+
+---
+
+- [OpenLibrary](https://openlibrary.org) — por la API de libros
+- [Google Drive API](https://developers.google.com/drive) — por el almacenamiento
+- [Shields.io](https://shields.io) — por los badges
+- [awesome-readme](https://github.com/matiassingers/awesome-readme) — por la inspiración
