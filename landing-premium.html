@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenBookDrive - Biblioteca Digital Gratuita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #09090B;
+      --bg-tertiary: #18181B;
+      --primary-400: #f59e0b;
+      --primary-500: #d97706;
+      --primary-600: #b45309;
+      --primary-700: #92400e;
+      --text-primary: #FFFFFF;
+      --text-secondary: #E4E4E7;
+      --text-tertiary: #A1A1AA;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+
+    .navbar.scrolled {
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(217, 119, 6, 0.15);
+    }
+
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .navbar-logo img {
+      height: 40px;
+      width: auto;
+    }
+
+    .navbar-logo span {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .navbar-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-500);
+      transition: width 0.3s ease;
+    }
+
+    .navbar-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .navbar-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(217, 119, 6, 0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 40%),
+                  var(--bg-primary);
+    }
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--primary-500);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: float-particle 15s infinite;
+    }
+
+    @keyframes float-particle {
+      0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+      25% { transform: translate(100px, -100px); opacity: 0.8; }
+      50% { transform: translate(-50px, -200px); opacity: 0.6; }
+      75% { transform: translate(-100px, -100px); opacity: 0.8; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(217, 119, 6, 0.1);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: var(--primary-400);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff 0%, #d97706 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-600), var(--primary-500), var(--primary-400), var(--primary-500));
+      background-size: 200% 200%;
+      animation: gradient-shift 4s ease infinite, pulse-glow 3s ease-in-out infinite;
+      color: #fff;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.5), 0 4px 24px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary-500);
+      background: rgba(217, 119, 6, 0.1);
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.5), 0 4px 24px rgba(217, 119, 6, 0.4); }
+      50% { box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.8), 0 8px 40px rgba(217, 119, 6, 0.6); }
+    }
+
+    /* Stats */
+    .stats {
+      padding: 4rem 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid rgba(217, 119, 6, 0.1);
+      border-bottom: 1px solid rgba(217, 119, 6, 0.1);
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      padding: 1rem;
+    }
+
+    .stat-number {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--primary-500);
+      display: block;
+    }
+
+    .stat-label {
+      color: var(--text-tertiary);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Services */
+    .services {
+      padding: 6rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .service-card-flip {
+      perspective: 1000px;
+      height: 400px;
+    }
+
+    .service-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .service-card-flip:hover .service-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .service-card-front,
+    .service-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .service-card-front {
+      background: var(--bg-tertiary);
+    }
+
+    .service-card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .service-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    }
+
+    .service-overlay h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .service-card-back {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(217, 119, 6, 0.04) 50%, rgba(217, 119, 6, 0.08) 100%);
+      backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(217, 119, 6, 0.15);
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .service-card-back h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary-400);
+    }
+
+    .service-card-back p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .service-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .feature-tag {
+      padding: 0.375rem 0.75rem;
+      background: rgba(217, 119, 6, 0.15);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      color: var(--primary-400);
+      font-weight: 500;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+
+    .testimonials-track {
+      display: flex;
+      animation: marquee 30s linear infinite;
+    }
+
+    .testimonials-track:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .testimonial-card {
+      flex-shrink: 0;
+      width: 400px;
+      margin: 0 1rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(217, 119, 6, 0.04) 50%, rgba(217, 119, 6, 0.08) 100%);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(217, 119, 6, 0.15);
+      border-radius: 24px;
+    }
+
+    .testimonial-quote {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .testimonial-quote::before {
+      content: '"';
+      font-size: 4rem;
+      color: var(--primary-500);
+      position: absolute;
+      top: -1.5rem;
+      left: -0.5rem;
+      font-family: Georgia, serif;
+      opacity: 0.5;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-500);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--primary-400);
+    }
+
+    .testimonial-info h4 {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .testimonial-info span {
+      font-size: 0.875rem;
+      color: var(--text-tertiary);
+    }
+
+    .stars {
+      color: var(--primary-400);
+      font-size: 0.875rem;
+    }
+
+    /* FAQ */
+    .faq {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.125rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: color 0.3s ease;
+    }
+
+    .faq-question:hover {
+      color: var(--primary-400);
+    }
+
+    .faq-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .faq-answer p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Donation */
+    .donation {
+      padding: 6rem 2rem;
+      background: radial-gradient(ellipse at 50% 50%, rgba(217, 119, 6, 0.2) 0%, transparent 70%),
+                  var(--bg-secondary);
+      text-align: center;
+    }
+
+    .donation-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .donation h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .donation p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .xrp-address {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .xrp-icon {
+      color: var(--primary-400);
+    }
+
+    .copy-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary-500);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary-400);
+    }
+
+    /* CTA */
+    .cta {
+      padding: 8rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(217, 119, 6, 0.3) 0%, transparent 60%);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    .cta h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta p {
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 4rem 2rem 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand {
+      max-width: 300px;
+    }
+
+    .footer-brand img {
+      height: 40px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand p {
+      color: var(--text-tertiary);
+      line-height: 1.7;
+      font-size: 0.875rem;
+    }
+
+    .footer-col h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col li {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-col a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-col a:hover {
+      color: var(--primary-400);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .footer-social a:hover {
+      background: var(--primary-500);
+      color: #fff;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.875rem;
+    }
+
+    /* Animations */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-links {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .service-card-flip:hover .service-card-inner {
+        transform: none;
+      }
+
+      .testimonial-card {
+        width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="navbar-logo">
+      <img src="/images/logo.png" alt="OpenBookDrive">
+      <span>OpenBookDrive</span>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#testimonios">Testimonios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#donar">Donar</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="hero-label">
+        📚 Biblioteca Digital Gratuita
+      </div>
+      <h1>Comparte y Descubre Libros Gratis</h1>
+      <p class="hero-subtitle">
+        OpenBookDrive es una plataforma comunitaria donde puedes acceder a miles de libros gratuitos, 
+        subir los tuyos y recibir recomendaciones personalizadas basadas en tus géneros favoritos.
+      </p>
+      <div class="hero-cta">
+        <a href="/libros" class="btn-primary">
+          🚀 Explorar Libros
+        </a>
+        <a href="https://github.com/oscaromargp/openbookdrive" target="_blank" class="btn-secondary">
+          ⭐ GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" data-target="1500">0</span>
+        <span class="stat-label">Libros Disponibles</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="12">0</span>
+        <span class="stat-label">Géneros</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="500">0</span>
+        <span class="stat-label">Usuarios Activos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="98">0</span>
+        <span class="stat-label">% Gratis</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="servicios">
+    <div class="section-header">
+      <h2>¿Qué Puedes Hacer?</h2>
+      <p>Todas las funcionalidades son completamente gratuitas</p>
+    </div>
+    <div class="services-grid">
+      <!-- Service 1 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_1.png" alt="Descubrir">
+            <div class="service-overlay">
+              <h3>📚 Descubrir</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Descubre Libros</h3>
+            <p>Explora nuestra biblioteca organizada por géneros. Desde ficción hasta ciencia, encuentra tu próxima lectura favorita.</p>
+            <div class="service-features">
+              <span class="feature-tag">12 Géneros</span>
+              <span class="feature-tag">Novedades</span>
+              <span class="feature-tag">Tendencias</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Service 2 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_2.png" alt="Buscar">
+            <div class="service-overlay">
+              <h3>🔍 Buscar</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Búsqueda Inteligente</h3>
+            <p>Encuentra libros instantáneamente por título, autor o género. Búsqueda en tiempo real con resultados inmediatos.</p>
+            <div class="service-features">
+              <span class="feature-tag">Tiempo Real</span>
+              <span class="feature-tag">Filtros</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Service 3 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_3.png" alt="Subir">
+            <div class="service-overlay">
+              <h3>📤 Subir</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Comparte Libros</h3>
+            <p>Sube tus libros a Google Drive y compártelos con la comunidad. Todo el almacenamiento es gratuito e ilimitado.</p>
+            <div class="service-features">
+              <span class="feature-tag">Google Drive</span>
+              <span class="feature-tag">Sin Límite</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Service 4 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_4.png" alt="Solicitar">
+            <div class="service-overlay">
+              <h3>📩 Solicitar</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Pide Libros</h3>
+            <p>¿No encuentras un libro? Solicítalo y la comunidad te ayudará a encontrarlo. Gestión colaborativa.</p>
+            <div class="service-features">
+              <span class="feature-tag">Comunidad</span>
+              <span class="feature-tag">Seguimiento</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Service 5 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_5.png" alt="Personalizar">
+            <div class="service-overlay">
+              <h3>👤 Personalizar</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Para Ti</h3>
+            <p>Configura tus géneros favoritos y recibe recomendaciones personalizadas basadas en tus preferencias.</p>
+            <div class="service-features">
+              <span class="feature-tag">Recomendaciones</span>
+              <span class="feature-tag">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Service 6 -->
+      <div class="service-card-flip">
+        <div class="service-card-inner">
+          <div class="service-card-front">
+            <img src="/images/service_6.png" alt="Descargar">
+            <div class="service-overlay">
+              <h3>📥 Leer y Descargar</h3>
+            </div>
+          </div>
+          <div class="service-card-back">
+            <h3>Acceso Libre</h3>
+            <p>Lee directamente en línea o descarga en PDF. Acceso instantáneo sin registro obligatorio.</p>
+            <div class="service-features">
+              <span class="feature-tag">Online</span>
+              <span class="feature-tag">PDF</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonios">
+    <div class="section-header">
+      <h2>Lo que dicen nuestros usuarios</h2>
+    </div>
+    <div class="testimonials-track">
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Increíble plataforma. Encontré libros que buscaba hace años y todo gratis. La recomiendo totalmente.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MR</div>
+          <div class="testimonial-info">
+            <h4>María Rodríguez</h4>
+            <span>Estudiante</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">La sección 'Para Ti' me ayuda a descubrir libros que realmente me interesan. Muy útil.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JL</div>
+          <div class="testimonial-info">
+            <h4>Juan López</h4>
+            <span>Lector frecuente</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Pude subir mis libros de universidad y ahora otros estudiantes también pueden acceder a ellos.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AC</div>
+          <div class="testimonial-info">
+            <h4>Ana Carolina</h4>
+            <span>Contribuidora</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Sistema de solicitudes muy efectivo. Pedí un libro y en 2 días ya estaba disponible.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">PM</div>
+          <div class="testimonial-info">
+            <h4>Pedro Martínez</h4>
+            <span>Usuario</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Increíble plataforma. Encontré libros que buscaba hace años y todo gratis. La recomiendo totalmente.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MR</div>
+          <div class="testimonial-info">
+            <h4>María Rodríguez</h4>
+            <span>Estudiante</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">La sección 'Para Ti' me ayuda a descubrir libros que realmente me interesan. Muy útil.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JL</div>
+          <div class="testimonial-info">
+            <h4>Juan López</h4>
+            <span>Lector frecuente</span>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Donation -->
+  <section class="donation" id="donar">
+    <div class="donation-content">
+      <h2>💛 Apoya el Proyecto</h2>
+      <p>OpenBookDrive es gratis gracias a la comunidad. Si te es útil, considera donate para mantener los servidores y seguir creciendo.</p>
+      <div class="xrp-address">
+        <span class="xrp-icon">✦</span>
+        <span id="xrp-text">rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj</span>
+        <button class="copy-btn" onclick="copyXRP()">Copiar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="section-header">
+      <h2>Preguntas Frecuentes</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <button class="faq-question">¿Es realmente gratis?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Sí, 100% gratuito. Sin costos de suscripción, sin anuncios intrusivos, todo el contenido es de libre acceso.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Cómo subo mis libros?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Inicia sesión con tu email, ve a "Subir" y te redireccionamos a Google Drive para subir tus PDFs.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Qué formatos soportan?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Actualmente PDF. Lee en línea o descárgalo. Pronto más formatos.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Cómo funciona "Para Ti"?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Selecciona tus géneros favoritos y recibe recomendaciones personalizadas.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Necesito registrarme?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>No es obligatorio. Explora y lee sin registrarte. Solo necesitas email para subir o solicitar libros.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Qué libros puedo encontrar?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>12 géneros: Ficción, No Ficción, Ciencia, Tecnología, Arte, Historia, Filosofía, Autoayuda, Negócios, Derecho, Medicina y más.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Cómo funciona la búsqueda?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Búsqueda en tiempo real por título, autor o género. Filtra por género para afinar resultados.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Los libros son legales?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Todos son subidos por la comunidad. Algunos en dominio público, otros con permisos. Respetamos derechos de autor.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Hay límite de descargas?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Sin límites. Descarga todos los libros que quieras, cuando quieras.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">¿Cómo-contacto al equipo?<span class="faq-icon">▼</span></button>
+        <div class="faq-answer"><p>Escríbenos a hola@openbookdrive.com o visítanos en GitHub.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-content">
+      <h2>¿Listo para explorar?</h2>
+      <p>Únete a nuestra comunidad y descubre tu próximo libro favorito hoy mismo.</p>
+      <a href="/libros" class="btn-primary">
+        🚀 Ir a OpenBookDrive
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+<img src="/images/logo.png" alt="OpenBookDrive">
+        <p>Biblioteca digital gratuita para compartir y descubrir libros. Construido con amor por la comunidad.</p>
+        <div class="footer-social">
+          <a href="https://github.com/oscaromargp/openbookdrive" target="_blank" aria-label="GitHub">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Enlaces</h4>
+        <ul>
+          <li><a href="/libros">Inicio</a></li>
+          <li><a href="/libros">Explorar</a></li>
+          <li><a href="#">Subir</a></li>
+          <li><a href="#">Solicitar</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:hola@openbookdrive.com">hola@openbookdrive.com</a></li>
+          <li><a href="https://github.com/oscaromargp/openbookdrive">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 OpenBookDrive. Todos los derechos reservados. Construido con ❤️ por la comunidad.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // Stats counter
+    const stats = document.querySelectorAll('.stat-number');
+    const animateStats = () => {
+      stats.forEach(stat => {
+        const target = parseInt(stat.dataset.target);
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) {
+            stat.textContent = target + '+';
+            clearInterval(timer);
+          } else {
+            stat.textContent = Math.floor(current);
+          }
+        }, 16);
+      });
+    };
+
+    // Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          if (entry.target.classList.contains('stats')) {
+            animateStats();
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        item.classList.toggle('active');
+      });
+    });
+
+    // Copy XRP
+    function copyXRP() {
+      const xrp = 'rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj';
+      navigator.clipboard.writeText(xrp).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => btn.textContent = 'Copiar', 2000);
+      });
+    }
+  </script>
+</body>
+</html>
