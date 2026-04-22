@@ -78,8 +78,10 @@ function MainApp() {
     })
   }, [books, filterQuery, filterType, fuse, sortBy])
 
+  const isSearching = filterQuery.trim().length > 0
+
   const filteredBooksByGenre = useMemo(() => {
-    if (filterType === 'genre' && filterQuery.trim()) {
+    if (isSearching) {
       return filteredBooks.reduce((acc, book) => {
         if (!acc[book.genre]) acc[book.genre] = []
         acc[book.genre].push(book)
@@ -87,7 +89,7 @@ function MainApp() {
       }, {})
     }
     return booksByGenre
-  }, [filteredBooks, booksByGenre, filterType, filterQuery])
+  }, [filteredBooks, booksByGenre, isSearching])
 
   useEffect(() => {
     if (user && showLanding) {
@@ -289,7 +291,7 @@ function MainApp() {
             </div>
           ) : (
             <>
-              <Hero book={featuredBook} onOpen={handleBookClick} />
+              {!isSearching && <Hero book={featuredBook} onOpen={handleBookClick} />}
               
               <div className="py-8">
                 {genres.length === 0 ? (
@@ -303,8 +305,27 @@ function MainApp() {
                       Subir primer libro
                     </button>
                   </div>
+                ) : isSearching ? (
+                  <div className="px-4 md:px-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-xl font-bold text-white">
+                        Resultados de búsqueda ({filteredBooks.length})
+                      </h2>
+                      <button
+                        onClick={() => { setFilterQuery(''); setFilterType('all'); }}
+                        className="text-sm text-primary hover:text-primary-light transition"
+                      >
+                        Limpiar búsqueda
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      {filteredBooks.map(book => (
+                        <BookCard key={book.id} book={book} onClick={handleBookClick} />
+                      ))}
+                    </div>
+                  </div>
                 ) : (
-                  (filterType === 'genre' && filterQuery.trim() ? Object.keys(filteredBooksByGenre) : genres).map(genre => (
+                  Object.keys(filteredBooksByGenre).map(genre => (
                     <BookRow
                       key={genre}
                       genre={genre}

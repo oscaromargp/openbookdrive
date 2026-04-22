@@ -5,6 +5,8 @@ export default function BookModal({ book, onClose, onDownload }) {
   const [bookDetails, setBookDetails] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showReader, setShowReader] = useState(false)
+  const [iframeError, setIframeError] = useState(false)
+  const [iframeLoading, setIframeLoading] = useState(true)
   const { getBookDetails, searchBooks } = useOpenLibrary()
 
   useEffect(() => {
@@ -65,6 +67,11 @@ export default function BookModal({ book, onClose, onDownload }) {
     return () => window.removeEventListener('keydown', handleKey)
   }, [onClose, showReader])
 
+  useEffect(() => {
+    setIframeError(false)
+    setIframeLoading(true)
+  }, [book?.viewUrl])
+
   if (!book) return null
 
   const title = book.title || book.name || 'Sin título'
@@ -92,51 +99,116 @@ export default function BookModal({ book, onClose, onDownload }) {
   if (showReader && book.viewUrl) {
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4"
-        onClick={() => setShowReader(false)}
+        className="fixed inset-0 z-50 flex flex-col bg-dark"
+        style={{ paddingTop: '60px' }}
       >
-        <div
-          className="relative bg-dark rounded-2xl overflow-hidden w-full max-w-5xl h-[90vh] shadow-2xl border border-white/10"
-          onClick={e => e.stopPropagation()}
-        >
-          <button
-            onClick={() => setShowReader(false)}
-            className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-white text-3xl bg-black/70 rounded-full hover:bg-black transition"
-          >
-            ×
-          </button>
-          <div className="absolute top-4 left-4 z-20 px-4 py-2 bg-black/70 rounded-lg">
+        <div className="absolute top-0 left-0 right-0 h-16 bg-dark/95 backdrop-blur-md flex items-center justify-between px-6 border-b border-white/10 z-10">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowReader(false)}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm">Volver</span>
+            </button>
+            <div className="h-6 w-px bg-white/10"></div>
             <h3 className="text-white font-medium truncate max-w-md">{title}</h3>
           </div>
+          <div className="flex items-center gap-3">
+            {book.downloadUrl && (
+              <a
+                href={book.downloadUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition"
+                onClick={() => onDownload && onDownload(book)}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Descargar
+              </a>
+            )}
+            <button
+              onClick={() => setShowReader(false)}
+              className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-white transition"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        {iframeLoading && (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Cargando visor...</p>
+            </div>
+          </div>
+        )}
+        
+        {iframeError ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center max-w-md px-4">
+              <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <h3 className="text-xl font-bold text-white mb-2">No se puede mostrar el libro</h3>
+              <p className="text-gray-400 mb-4">El visor de Google Drive no está disponible para este archivo.</p>
+              {book.downloadUrl && (
+                <a
+                  href={book.downloadUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Descargar libro
+                </a>
+              )}
+            </div>
+          </div>
+        ) : (
           <iframe
             src={book.viewUrl}
-            className="w-full h-full rounded-2xl"
+            className="w-full flex-1"
             title={`Leer ${title}`}
             allow="autoplay"
+            onLoad={() => setIframeLoading(false)}
+            onError={() => { setIframeLoading(false); setIframeError(true); }}
           />
-        </div>
+        )}
       </div>
     )
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
       onClick={onClose}
     >
       <div
-        className="relative bg-card rounded-2xl overflow-hidden max-w-4xl w-full shadow-2xl border border-white/10 my-4"
+        className="relative bg-card rounded-2xl overflow-hidden max-w-6xl w-full h-[85vh] shadow-2xl border border-white/10 flex flex-col"
         onClick={e => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-white text-3xl bg-black/50 rounded-full hover:bg-black/70 transition"
-        >
-          ×
-        </button>
-
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-64 lg:w-80 flex-shrink-0 bg-black relative">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <h2 className="text-lg font-bold text-white truncate">{title}</h2>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-white text-2xl hover:bg-white/10 rounded-full transition"
+          >
+            ×
+          </button>
+        </div>
+        
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-64 lg:w-80 flex-shrink-0 bg-black relative">
             <div className="aspect-[2/3] w-full h-full">
               <img
                 src={bookDetails?.cover || cover}
@@ -147,7 +219,7 @@ export default function BookModal({ book, onClose, onDownload }) {
             </div>
           </div>
 
-          <div className="flex-1 p-6 md:p-8 flex flex-col max-h-[70vh] overflow-y-auto">
+          <div className="flex-1 p-6 md:p-8 overflow-y-auto">
             <div className="flex flex-wrap items-center gap-3 mb-3">
               <span className="px-3 py-1 text-xs font-semibold rounded bg-amber-900/40 text-amber-400 border border-amber-800/30">
                 {book.genre || 'General'}
@@ -186,7 +258,7 @@ export default function BookModal({ book, onClose, onDownload }) {
 
             {description && (
               <div className="mb-6">
-                <p className="text-gray-400 text-sm leading-relaxed line-clamp-4">
+                <p className="text-gray-400 text-sm leading-relaxed">
                   {description}
                 </p>
               </div>
