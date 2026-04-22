@@ -83,6 +83,23 @@ export function useAuth() {
     setUser(null)
   }, [])
 
+  const updateProfile = useCallback(async (profileData) => {
+    if (!user) return { success: false, error: 'No hay usuario' }
+
+    const updatedUser = {
+      ...user,
+      profile: {
+        ...user.profile,
+        ...profileData
+      },
+      updated_at: new Date().toISOString()
+    }
+
+    localStorage.setItem('openbookdrive_user', JSON.stringify(updatedUser))
+    setUser(updatedUser)
+    return { success: true, user: updatedUser }
+  }, [user])
+
   const updateStats = useCallback(async (action, bookTitle) => {
     if (!user) return { success: false, error: 'No hay usuario' }
 
@@ -113,6 +130,7 @@ export function useAuth() {
     error,
     login,
     logout,
+    updateProfile,
     updateStats,
     isSupabaseConnected: !!supabase,
   }

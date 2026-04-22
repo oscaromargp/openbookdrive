@@ -11,6 +11,7 @@ import UploadModal from './components/UploadModal'
 import RequestModal from './components/RequestModal'
 import RequestList from './components/RequestList'
 import AuthModal from './components/AuthModal'
+import ProfileModal from './components/ProfileModal'
 import Terminos from './pages/Terminos'
 import Privacidad from './pages/Privacidad'
 
@@ -33,6 +34,7 @@ function MainApp() {
   const [showRequest, setShowRequest] = useState(false)
   const [showRequestList, setShowRequestList] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [showLanding, setShowLanding] = useState(true)
@@ -42,6 +44,14 @@ function MainApp() {
 
   const featuredBook = books[0] || null
   const genres = Object.keys(booksByGenre)
+  const favoriteGenres = user?.profile?.favoriteGenres || []
+
+  const booksForYou = useMemo(() => {
+    if (favoriteGenres.length === 0) return []
+    return books.filter(book => 
+      favoriteGenres.includes(book.genre)
+    ).slice(0, 10)
+  }, [books, favoriteGenres])
 
   const fuse = useMemo(() => new Fuse(books, {
     keys: ['title', 'name', 'author', 'genre'],
@@ -226,9 +236,18 @@ function MainApp() {
 
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-400 hidden md:block">
-                {user.email}
-              </span>
+              <button
+                onClick={() => setShowProfile(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-amber-400 transition"
+                title="Configurar perfil"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="hidden md:block">
+                  {user.profile?.name || user.email.split('@')[0]}
+                </span>
+              </button>
               <button
                 onClick={() => { logout(); setShowLanding(true) }}
                 className="text-sm text-gray-500 hover:text-white transition"
@@ -292,6 +311,22 @@ function MainApp() {
           ) : (
             <>
               {!isSearching && <Hero book={featuredBook} onOpen={handleBookClick} />}
+              
+              {!isSearching && booksForYou.length > 0 && (
+                <div className="py-8 px-4 md:px-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h2 className="text-xl font-bold text-white">Para Ti</h2>
+                    <span className="text-xs px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full">
+                      Basado en tus géneros favoritos
+                    </span>
+                  </div>
+                  <div className="flex gap-4 overflow-x-auto pb-4">
+                    {booksForYou.map(book => (
+                      <BookCard key={book.id} book={book} onClick={handleBookClick} />
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="py-8">
                 {genres.length === 0 ? (
@@ -410,6 +445,10 @@ function MainApp() {
           onClose={() => setShowAuth(false)}
           onLoginSuccess={handleLoginSuccess}
         />
+      )}
+
+      {showProfile && (
+        <ProfileModal onClose={() => setShowProfile(false)} />
       )}
 
       {showLoginPrompt && (
