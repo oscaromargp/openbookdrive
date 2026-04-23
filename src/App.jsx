@@ -154,8 +154,10 @@ function MainApp() {
       <LandingPage 
         onLogin={() => setShowAuth(true)}
         onExplore={handleExplore}
+        onUpload={handleOpenUpload}
         onDownload={handleDownload}
         bookCount={books.length}
+        books={books}
       />
     )
   }
@@ -215,23 +217,23 @@ function MainApp() {
 
         <div className="flex items-center gap-2 md:gap-4">
           <button
-            onClick={() => setShowRequestList(true)}
-            className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-amber-400 transition"
+            onClick={handleOpenUpload}
+            className="hidden md:flex items-center gap-2 px-3 py-2 text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg transition border border-amber-500/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="hidden lg:inline">Solicitudes</span>
+            <span className="hidden lg:inline">Solicitar</span>
           </button>
-
+          
           <button
-            onClick={handleOpenUpload}
+            onClick={() => setShowLanding(false)}
             className="hidden md:flex items-center gap-2 px-3 py-2 text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg transition border border-amber-500/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span className="hidden lg:inline">Subir</span>
+            <span className="hidden lg:inline">Biblioteca</span>
           </button>
 
           {user ? (
@@ -651,7 +653,7 @@ function generatePlaceholderHTML(title, fileType) {
   `
 }
 
-function LandingPage({ onLogin, onExplore, onDownload, bookCount }) {
+function LandingPage({ onLogin, onExplore, onUpload, onDownload, bookCount, books }) {
   const [particles, setParticles] = useState([])
 
   useEffect(() => {
@@ -667,6 +669,17 @@ function LandingPage({ onLogin, onExplore, onDownload, bookCount }) {
   const copyXRP = () => {
     navigator.clipboard.writeText('rBthUCndKy3Xbb19Ln4xkZeMwusX9NrYfj')
   }
+
+  const featuredTitles = [
+    'Isaac Asimov - Fundación Completa',
+    'Daniel Goleman - Inteligencia Emocional',
+    'Robert Greene - Las 48 Leyes del Poder',
+    'Brian Tracy - El Arte de Cerrar la Venta',
+    'Stephen Covey - Los 7 Hábitos',
+    'Robert Kiyosaki - El Juego del Dinero',
+    'Gary Keller - The One Thing',
+    'Napoleón Hill - Piense y Hágase Rico'
+  ]
 
   return (
     <div className="min-h-screen bg-dark text-white overflow-x-hidden">
@@ -725,10 +738,10 @@ function LandingPage({ onLogin, onExplore, onDownload, bookCount }) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button onClick={onExplore} className="px-8 py-4 rounded-xl font-bold text-lg transition bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary shadow-lg shadow-amber-900/30" style={{ boxShadow: '0 0 30px rgba(217, 119, 6, 0.3)' }}>
-                Explorar Biblioteca
+                📚 Explorar Biblioteca ({bookCount || 160}+ libros)
               </button>
-              <button onClick={onLogin} className="px-8 py-4 rounded-xl font-semibold text-gray-300 hover:text-white transition" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                Subir un Libro
+              <button onClick={onUpload} className="px-8 py-4 rounded-xl font-semibold text-gray-300 hover:text-white transition" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                📤 Subir un Libro
               </button>
             </div>
             <div className="mt-10 flex items-center justify-center lg:justify-start gap-8">
@@ -810,6 +823,28 @@ function LandingPage({ onLogin, onExplore, onDownload, bookCount }) {
                 Copiar
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16" style={{ background: 'linear-gradient(180deg, rgba(217, 119, 6, 0.08) 0%, transparent 100%)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-3">📚 <span className="text-primary-light">Libros Destacados</span></h2>
+            <p className="text-gray-400">Algunos títulos disponibles en nuestra biblioteca</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {featuredTitles.map((title, i) => (
+              <div key={i} className="p-4 rounded-xl text-left cursor-pointer hover:bg-white/5 transition" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <span className="text-xs text-amber-400">📖</span>
+                <p className="text-sm text-white mt-1 line-clamp-2">{title}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button onClick={onExplore} className="px-8 py-3 rounded-xl font-bold bg-primary hover:bg-primary-dark transition">
+              Ver todos los {bookCount || 160}+ libros →
+            </button>
           </div>
         </div>
       </section>
