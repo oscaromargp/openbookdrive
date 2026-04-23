@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/libros", "destination": "/app.html" },
-    { "source": "/libros/:path", "destination": "/app.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/app.html" }
   ]
 }
