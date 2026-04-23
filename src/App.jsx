@@ -18,10 +18,9 @@ import Privacidad from './pages/Privacidad'
 export default function App() {
   return (
     <Routes>
-      <Route path="/libros" element={<LandingPageDirect />} />
       <Route path="/terminos" element={<Terminos />} />
       <Route path="/privacidad" element={<Privacidad />} />
-      <Route path="/" element={<LandingPageDirect />} />
+      <Route path="*" element={<MainApp />} />
     </Routes>
   )
 }
@@ -38,7 +37,7 @@ function MainApp() {
   const [showProfile, setShowProfile] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const [showLanding, setShowLanding] = useState(true)
+  const [showLanding, setShowLanding] = useState(false)
   const [filterType, setFilterType] = useState('all')
   const [filterQuery, setFilterQuery] = useState('')
   const [sortBy, setSortBy] = useState('title')
