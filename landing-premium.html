@@ -738,6 +738,13 @@
       font-size: 0.875rem;
     }
 
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
     /* Animations */
     .fade-in-up {
       opacity: 0;
@@ -813,20 +820,41 @@
   <section class="stats">
     <div class="stats-container">
       <div class="stat-item">
-        <span class="stat-number" data-target="1500">0</span>
+        <span class="stat-number" id="book-count" data-target="0">0</span>
         <span class="stat-label">Libros Disponibles</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="12">0</span>
-        <span class="stat-label">Géneros</span>
+        <span class="stat-number" id="author-count" data-target="0">0</span>
+        <span class="stat-label">Autores Únicos</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="500">0</span>
-        <span class="stat-label">Usuarios Activos</span>
+        <span class="stat-number" data-target="100">100%</span>
+        <span class="stat-label">Gratuito</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="98">0</span>
-        <span class="stat-label">% Gratis</span>
+        <span class="stat-number" data-target="100">∞</span>
+        <span class="stat-label">Accesos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Books -->
+  <section class="py-16" style="background: linear-gradient(180deg, #0a0a0f 0%, #131318 100%);">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">📚 <span style="color: #f59e0b;">Libros Recomendados</span></h2>
+        <p class="text-gray-400">Algunos de los títulos más populares de nuestra biblioteca</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="featured-books">
+        <!-- Books will be loaded dynamically -->
+        <div class="text-center text-gray-500 col-span-full py-8">
+          Cargando libros...
+        </div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="/libros" class="inline-block px-8 py-4 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition" style="box-shadow: 0 0 30px rgba(217, 119, 6, 0.3);">
+          Ver todos los libros →
+        </a>
       </div>
     </div>
   </section>
@@ -1220,6 +1248,57 @@
         setTimeout(() => btn.textContent = 'Copiar', 2000);
       });
     }
+
+    // Load real stats and books from Google Drive
+    const FOLDER_ID = '1iSvuUSw8ud2qPDFmACxZCt0k4hyAKtTM';
+    const API_KEY = 'AIzaSyDHeIigeoSb2QzXRX4GvPa9PgDc5lrepBA';
+
+    async function loadBooks() {
+      try {
+        const query = encodeURIComponent(`'${FOLDER_ID}' in parents and trashed=false`);
+        const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${API_KEY}&fields=files(id,name)&pageSize=200`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.files && data.files.length > 0) {
+          const books = data.files.map(f => ({
+            id: f.id,
+            name: f.name.replace(/\.(pdf|epub|mobi|docx?)$/i, '').substring(0, 40)
+          }));
+          
+          // Update book count
+          const bookCount = document.getElementById('book-count');
+          bookCount.textContent = books.length;
+          
+          // Count unique authors (simple extraction from names)
+          const authors = new Set();
+          books.forEach(b => {
+            const parts = b.name.split(/[-–—]/);
+            if (parts.length > 1) authors.add(parts[0].trim());
+          });
+          const authorCount = document.getElementById('author-count');
+          authorCount.textContent = Math.max(authors.size, 10);
+          
+          // Display featured books
+          const container = document.getElementById('featured-books');
+          const featured = books.slice(0, 12);
+          container.innerHTML = featured.map(book => `
+            <div class="p-4 rounded-xl text-left cursor-pointer hover:bg-white/5 transition" 
+                 style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);"
+                 onclick="window.location.href='/libros'">
+              <span class="text-xs text-amber-400">📖</span>
+              <p class="text-sm text-white mt-2 line-clamp-3" style="font-size: 0.85rem;">${book.name}</p>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.log('Error loading books:', err);
+      }
+    }
+
+    // Load books when page loads
+    loadBooks();
   </script>
 </body>
 </html>
