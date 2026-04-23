@@ -41,10 +41,36 @@ function MainApp() {
   const [filterType, setFilterType] = useState('all')
   const [filterQuery, setFilterQuery] = useState('')
   const [sortBy, setSortBy] = useState('title')
+  const [viewMode, setViewMode] = useState('genre') // 'genre' or 'author'
 
   const featuredBook = books[0] || null
   const genres = Object.keys(booksByGenre)
   const favoriteGenres = user?.profile?.favoriteGenres || []
+
+  // Extract unique authors
+  const authors = useMemo(() => {
+    const authorSet = new Set()
+    books.forEach(book => {
+      const name = book.name || book.title || ''
+      const parts = name.split(/[-–—:]/)
+      if (parts.length > 1) {
+        authorSet.add(parts[0].trim())
+      }
+    })
+    return Array.from(authorSet).slice(0, 20)
+  }, [books])
+
+  const booksByAuthor = useMemo(() => {
+    const authorBooks = {}
+    books.forEach(book => {
+      const name = book.name || book.title || ''
+      const parts = name.split(/[-–—:]/)
+      const author = parts.length > 1 ? parts[0].trim() : 'Otros'
+      if (!authorBooks[author]) authorBooks[author] = []
+      authorBooks[author].push(book)
+    })
+    return authorBooks
+  }, [books])
 
   const booksForYou = useMemo(() => {
     if (favoriteGenres.length === 0) return []
@@ -206,9 +232,35 @@ function MainApp() {
           </div>
         </div>
         
-        {/* Genre Filters */}
-        <div className="hidden md:flex items-center gap-2 px-4 md:px-8 pb-3 overflow-x-auto">
-          {genres.slice(0, 8).map(genre => (
+        {/* View Mode Toggle + Genre/Author Filters */}
+        <div className="px-4 md:px-8 pb-3">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm text-gray-500">Ver por:</span>
+            <button
+              onClick={() => setViewMode('genre')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                viewMode === 'genre' 
+                  ? 'bg-amber-500 text-white' 
+                  : 'bg-white/10 text-gray-400 hover:bg-white/20'
+              }`}
+            >
+              📚 Género
+            </button>
+            <button
+              onClick={() => setViewMode('author')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                viewMode === 'author' 
+                  ? 'bg-amber-500 text-white' 
+                  : 'bg-white/10 text-gray-400 hover:bg-white/20'
+              }`}
+            >
+              👤 Autor
+            </button>
+          </div>
+          
+          {/* Genre Filters */}
+          <div className="hidden md:flex items-center gap-2 overflow-x-auto">
+          {viewMode === 'genre' ? genres.slice(0, 10).map(genre => (
             <button
               key={genre}
               onClick={() => { setFilterType('genre'); setFilterQuery(genre); }}
@@ -218,7 +270,19 @@ function MainApp() {
                   : 'bg-white/10 text-gray-400 hover:bg-white/20'
               }`}
             >
-              {genre}
+              {genre} ({(booksByGenre[genre] || []).length})
+            </button>
+          )) : Object.keys(booksByAuthor).slice(0, 10).map(author => (
+            <button
+              key={author}
+              onClick={() => { setFilterType('author'); setFilterQuery(author); }}
+              className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition ${
+                filterType === 'author' && filterQuery === author 
+                  ? 'bg-amber-500 text-white' 
+                  : 'bg-white/10 text-gray-400 hover:bg-white/20'
+              }`}
+            >
+              {author.substring(0, 20)} ({(booksByAuthor[author] || []).length})
             </button>
           ))}
         </div>
@@ -326,6 +390,17 @@ function MainApp() {
                         <BookCard key={book.id} book={book} onClick={handleBookClick} />
                       ))}
                     </div>
+                  </div>
+                ) : viewMode === 'author' ? (
+                  <div className="px-4 md:px-8">
+                    {Object.keys(booksByAuthor).map(author => (
+                      <BookRow
+                        key={author}
+                        genre={author}
+                        books={booksByAuthor[author] || []}
+                        onBookClick={handleBookClick}
+                      />
+                    ))}
                   </div>
                 ) : (
                   Object.keys(filteredBooksByGenre).map(genre => (
