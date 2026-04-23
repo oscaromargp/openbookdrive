@@ -174,13 +174,13 @@ function MainApp() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
-          <button onClick={() => setShowLanding(true)} className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <span className="text-primary font-black text-2xl tracking-tight">Open</span>
             <span className="text-white font-black text-2xl tracking-tight">BookDrive</span>
-          </button>
+          </a>
         </div>
 
-        <div className="hidden md:flex items-center gap-4 flex-1 max-w-3xl mx-8">
+        <div className="hidden md:flex items-center gap-4 flex-1 max-w-4xl mx-8">
           <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 flex-1 border border-white/5">
             <select 
               value={filterType}
@@ -204,52 +204,28 @@ function MainApp() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-white/5 text-gray-400 text-sm px-3 py-2 rounded-lg border border-white/5 outline-none cursor-pointer hover:text-amber-400 transition"
-          >
-            <option value="title">A-Z</option>
-            <option value="recent">Más Recientes</option>
-            <option value="author">Autor</option>
-          </select>
+        </div>
+        
+        {/* Genre Filters */}
+        <div className="hidden md:flex items-center gap-2 px-4 md:px-8 pb-3 overflow-x-auto">
+          {genres.slice(0, 8).map(genre => (
+            <button
+              key={genre}
+              onClick={() => { setFilterType('genre'); setFilterQuery(genre); }}
+              className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition ${
+                filterType === 'genre' && filterQuery === genre 
+                  ? 'bg-amber-500 text-white' 
+                  : 'bg-white/10 text-gray-400 hover:bg-white/20'
+              }`}
+            >
+              {genre}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <button
-            onClick={handleOpenUpload}
-            className="hidden md:flex items-center gap-2 px-3 py-2 text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg transition border border-amber-500/20"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span className="hidden lg:inline">Solicitar</span>
-          </button>
-          
-          <button
-            onClick={() => setShowLanding(false)}
-            className="hidden md:flex items-center gap-2 px-3 py-2 text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg transition border border-amber-500/20"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span className="hidden lg:inline">Biblioteca</span>
-          </button>
-
           {user ? (
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowProfile(true)}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-amber-400 transition"
-                title="Configurar perfil"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="hidden md:block">
-                  {user.profile?.name || user.email.split('@')[0]}
-                </span>
-              </button>
               <button
                 onClick={() => { logout(); setShowLanding(true) }}
                 className="text-sm text-gray-500 hover:text-white transition"
@@ -257,17 +233,7 @@ function MainApp() {
                 Salir
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowAuth(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition text-sm font-medium text-white"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span className="hidden md:inline">Login</span>
-            </button>
-          )}
+          ) : null}
         </div>
       </nav>
 
@@ -374,39 +340,18 @@ function MainApp() {
               </div>
 
               <section className="py-8 px-4 md:px-8 border-t border-white/10">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-white">Colabora con la comunidad</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                  <button
-                    onClick={handleOpenUpload}
-                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-lg transition text-left"
+                <div className="max-w-2xl mx-auto text-center">
+                  <h2 className="text-xl font-bold text-white mb-2">🎁 ¿Quieres ganar un libro?</h2>
+                  <p className="text-gray-400 mb-4">Escríbenos y con gusto te enviaremos uno gratis</p>
+                  <a 
+                    href="mailto:hola@openbookdrive.com?subject=Quiero un libro gratis"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition"
                   >
-                    <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-white">Subir un libro</h3>
-                      <p className="text-sm text-gray-500">Comparte tus libros con la comunidad</p>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={handleOpenRequest}
-                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-lg transition text-left"
-                  >
-                    <div className="w-12 h-12 bg-gold/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-white">Solicitar libro</h3>
-                      <p className="text-sm text-gray-500">Pide un libro que necesitas</p>
-                    </div>
-                  </button>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Escríbenos
+                  </a>
                 </div>
               </section>
             </>
