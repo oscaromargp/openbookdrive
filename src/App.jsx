@@ -18,9 +18,10 @@ import Privacidad from './pages/Privacidad'
 export default function App() {
   return (
     <Routes>
+      <Route path="/libros" element={<LandingPageDirect />} />
       <Route path="/terminos" element={<Terminos />} />
       <Route path="/privacidad" element={<Privacidad />} />
-      <Route path="*" element={<MainApp />} />
+      <Route path="/" element={<LandingPageDirect />} />
     </Routes>
   )
 }
