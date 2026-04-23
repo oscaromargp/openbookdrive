@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useGoogleDrive } from './hooks/useGoogleDrive'
 import { useAuth } from './hooks/useAuth'
@@ -133,9 +133,9 @@ function MainApp() {
     }
   }, [user, showLanding])
 
-  const handleBookClick = (book) => {
+  const handleBookClick = useCallback((book) => {
     setSelectedBook(book)
-  }
+  }, [])
 
   const handleDownload = (book) => {
     if (user) {
@@ -529,16 +529,20 @@ function LoadingSkeleton() {
   )
 }
 
-function BookCard({ book, onClick }) {
+const BookCard = memo(function BookCard({ book, onClick }) {
   const cover = book?.cover || book?.thumbnail
   const fileType = getFileType(book?.rawName || book?.name || '')
   const title = book?.title || book?.name || 'Sin título'
   
   const isPlaceholder = !cover || cover.includes('drive.google.com/thumbnail')
 
+  const handleClick = useCallback(() => {
+    onClick && onClick(book)
+  }, [book, onClick])
+
   return (
     <div
-      onClick={() => onClick && onClick(book)}
+      onClick={handleClick}
       className="relative flex-shrink-0 w-36 md:w-40 cursor-pointer group"
     >
       <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card transition-all duration-300 ease-out group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-amber-900/30 group-hover:-translate-y-2">
@@ -568,6 +572,8 @@ function BookCard({ book, onClick }) {
             src={cover}
             alt={title}
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
             onError={e => {
               e.target.style.display = 'none'
               e.target.parentElement.innerHTML = generatePlaceholderHTML(title, fileType)
@@ -623,7 +629,7 @@ function BookCard({ book, onClick }) {
       </div>
     </div>
   )
-}
+})
 
 function getFileType(filename) {
   const ext = filename?.split('.')?.pop()?.toLowerCase()
