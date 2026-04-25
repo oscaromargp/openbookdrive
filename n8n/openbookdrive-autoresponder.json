@@ -1,0 +1,166 @@
+{
+  "name": "OpenBookDrive - Auto Responder Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "interval": 5
+            }
+          ]
+        }
+      },
+      "id": "check-emails-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "host": "imap.gmail.com",
+        "port": 993,
+        "ssl": true,
+        "username": "={{ $env.GMAIL_USER }}",
+        "password": "={{ $env.GMAIL_APP_PASSWORD }}",
+        "mailbox": "INBOX",
+        "options": {
+          "keepFlag": true,
+          "downloadAttachments": true,
+          "outputProperties": [
+            "from",
+            "subject",
+            "date",
+            "messageId"
+          ]
+        }
+      },
+      "id": "gmail-read",
+      "name": "Gmail - Leer Correos",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 1.2,
+      "position": [500, 300],
+      "credentials": {
+        "imap": {
+          "id": "gmail-imap-cred",
+          "name": "Gmail IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verificar si es un correo nuevo (no procesado)\nconst items = $input.all();\nconst processed = global.get('processedEmails', {}) || {};\nconst newEmails = [];\n\nfor (const item of items) {\n  const msgId = item.json.messageId;\n  const from = item.json.from || '';\n  const email = from.match(/<(.+)>/)?.[1] || from;\n  \n  // Saltar correos de sí mismo\n  if (email.includes('oscaromargp@gmail.com')) {\n    continue;\n  }\n  \n  // Verificar si ya fue procesado\n  if (processed[msgId]) {\n    continue;\n  }\n  \n  // Verificar si tiene adjuntos\n  const hasAttachments = item.jsonattachments && item.jsonattachments.length > 0;\n  \n  newEmails.push({\n    json: {\n      messageId: msgId,\n      from: email,\n      fromName: item.json.fromName || email.split('@')[0],\n      subject: item.json.subject || 'Sin asunto',\n      text: item.json.text || '',\n      html: item.json.html || '',\n      hasAttachments: hasAttachments,\n      attachmentCount: item.jsonattachments?.length || 0,\n      attachments: item.jsonattachments || []\n    }\n  });\n  \n  // Marcar como procesado\n  processed[msgId] = true;\n}\n\n// Guardar estado\nglobal.set('processedEmails', processed);\n\nreturn newEmails;"
+      },
+      "id": "filter-new",
+      "name": "Filtrar Correos Nuevos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.GMAIL_USER }}",
+        "to": "={{ $json.from }}",
+        "subject": "=Re: {{ $json.subject }}",
+        "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Confirmación de Recepción</title>\n  <style>\n    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #e0e0e0; margin: 0; padding: 20px; }\n    .container { max-width: 600px; margin: 0 auto; background: #16213e; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }\n    .header { background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%); padding: 30px; text-align: center; }\n    .header h1 { margin: 0; color: #fff; font-size: 24px; font-weight: 700; }\n    .content { padding: 30px; }\n    .greeting { font-size: 18px; margin-bottom: 20px; color: #f59e0b; }\n    .message { font-size: 16px; line-height: 1.6; margin-bottom: 20px; }\n    .highlight { background: #1a1a2e; padding: 20px; border-radius: 8px; border-left: 4px solid #e94560; margin: 20px 0; }\n    .highlight p { margin: 5px 0; }\n    .thanks { font-size: 20px; color: #f59e0b; text-align: center; margin: 30px 0; }\n    .footer { background: #0f0f23; padding: 20px; text-align: center; font-size: 12px; color: #666; }\n    .social { margin-top: 15px; }\n    .social a { color: #e94560; text-decoration: none; margin: 0 10px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>OpenBookDrive</h1>\n    </div>\n    <div class=\"content\">\n      <p class=\"greeting\">¡Hola {{ $json.fromName }}!</p>\n      \n      <p class=\"message\">\n        He recibido tu mensaje correctamente. Gracias por ponerte en contacto conmigo.\n      </p>\n      \n      <div class=\"highlight\">\n        <p><strong>📧 Asunto:</strong> {{ $json.subject }}</p>\n        <p><strong>📎 Adjuntos:</strong> {{ $json.attachmentCount }} archivo(s)</p>\n        <p><strong>🕐 Recibido:</strong> {{ $now.format('DD/MM/YYYY HH:mm') }}</p>\n      </div>\n      \n      <p class=\"thanks\">🙏 ¡Muchas gracias por tu confianza!</p>\n      \n      <p class=\"message\">\n        Estaré revisando tu mensaje y te responderé lo antes posible. Si necesitas algo urgente, no dudes en escribirme de nuevo.\n      </p>\n      \n      <p class=\"message\">\n        <strong>— Oscar Omar Gómez Peña</strong><br>\n        <a href=\"https://github.com/oscaromargp\" style=\"color: #e94560;\">GitHub</a> ·\n        <a href=\"https://oscaromargp.github.io\" style=\"color: #e94560;\">Portafolio</a>\n      </p>\n    </div>\n    <div class=\"footer\">\n      <p>Este mensaje fue enviado automáticamente por OpenBookDrive</p>\n      <div class=\"social\">\n        <a href=\"https://github.com/oscaromargp\">GitHub</a>\n        <a href=\"https://openbookdrive.vercel.app\">OpenBookDrive</a>\n      </div>\n    </div>\n  </div>\n</body>\n</html>",
+        "attachments": "={{ $json.attachments }}"
+      },
+      "id": "gmail-send",
+      "name": "Gmail - Enviar Respuesta",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1000, 300],
+      "credentials": {
+        "gmail": {
+          "id": "gmail-smtp-cred",
+          "name": "Gmail SMTP"
+        }
+      },
+      "notes": "Respuesta automática confirmando recepción"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "fileName": "=/data/received-emails.json",
+        "options": {
+          "dataPropertyNameJsonOutput": false
+        }
+      },
+      "id": "log-emails",
+      "name": "Guardar en Log",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "check-emails-trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Leer Correos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Leer Correos": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Correos Nuevos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Correos Nuevos": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Enviar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Enviar Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Guardar en Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": ["gmail", "autoresponder", "openbookdrive"],
+  "meta": {
+    "templateCredsSetup": [
+      {
+        "name": "Gmail IMAP",
+        "credentialsId": "gmail-imap-cred"
+      },
+      {
+        "name": "Gmail SMTP",
+        "credentialsId": "gmail-smtp-cred"
+      }
+    ]
+  },
+  "versionId": "1.0.0",
+  "id": "openbookdrive-gmail-autoresponder",
+  "description": "Workflow automático que responde 'muchas gracias' cuando receives correos con documentos"
+}

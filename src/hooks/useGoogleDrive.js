@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 const FOLDER_ID = import.meta.env.VITE_DRIVE_FOLDER_ID
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY
@@ -11,24 +11,6 @@ const GENRE_KEYWORDS = {
   'Ciencias': ['ciencia', 'science', 'matematicas', 'physics', 'quimica', 'biologia', 'biology'],
   'Negocios': ['negocios', 'business', 'emprendimiento', 'startup', 'marketing', 'finanzas', 'finance', 'economia'],
   'Arte & Diseño': ['arte', 'art', 'diseño', 'design', 'fotografia', 'photography', 'pintura', 'musica'],
-}
-
-const genreKeywordsMap = useMemo(() => {
-  const map = {}
-  for (const [genre, keywords] of Object.entries(GENRE_KEYWORDS)) {
-    for (const kw of keywords) {
-      map[kw] = genre
-    }
-  }
-  return map
-}, [])
-
-function detectGenre(filename) {
-  const lower = filename.toLowerCase()
-  for (const [genre, keywords] of Object.entries(GENRE_KEYWORDS)) {
-    if (keywords.some(kw => lower.includes(kw))) return genre
-  }
-  return 'General'
 }
 
 const DEMO_BOOKS = [
