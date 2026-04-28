@@ -66,7 +66,7 @@ export function useGoogleDrive() {
       try {
         const query = encodeURIComponent(`'${FOLDER_ID}' in parents and trashed=false`)
         const fields = encodeURIComponent('files(id,name,mimeType,thumbnailLink,webViewLink,webContentLink,size,createdTime)')
-        const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${API_KEY}&fields=${fields}&pageSize=500`
+        const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${API_KEY}&fields=${fields}&pageSize=1000`
 
         const res = await fetch(url)
         if (!res.ok) {
